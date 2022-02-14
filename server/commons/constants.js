@@ -28,7 +28,7 @@ const STATUS = {
   ERROR:6
 }
 
-const BLOCKCHAIN_DEFAULT =['eth','tron'];
+const BLOCKCHAIN_DEFAULT =['bsc'];
 
 const EMAIL_TEMPLATE = {  
   SIGNUP:{

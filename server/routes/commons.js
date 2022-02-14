@@ -9,6 +9,9 @@ const Blockchain = require("../models/blockchain");
 const BlockchainsUser = require("../models/blockchains_user");
 const CryptoCurrency = require("../models/cryptocurrency");
 const axios = require('axios');
+const fs = require('fs');
+const got = require('got');
+const { JSDOM } = require('jsdom');
 const {
   verificaToken,
   validateCaptcha
@@ -16,6 +19,55 @@ const {
 } = require("../middleware/autenticacion");
 const app = express();
 app.use(cors());
+
+/**
+ * Obtiene el precio de utopia
+ */
+app.post("/api/commons/getPriceUtopia", (req, resp) => {
+
+  const vgmUrl= 'https://geckoterminal.com/bsc/pools/0xe42b62d2de88d575972b84b95f153bd03765533e';
+
+  got(vgmUrl).then(response => {
+    const dom = new JSDOM(response.body);
+    var price =  dom.window.document.querySelector("[data-price-target='price']").textContent;
+    price = price.replace('$','');
+    return resp.json({
+      ok: true,
+      data: parseFloat(price)
+    });
+  }).catch(err => {
+    console.log(err);
+    return resp.status(400).json({
+      ok: false,
+      error,
+    });  
+  });
+
+});
+
+/**
+ * Obtiene el precio de una moneda de coingecko
+ */
+app.post("/api/commons/getCryptoCurrencyGecko", (req, resp) => {
+
+  let body = req.body;
+  let symbol = body.symbol;
+
+  getQueryCoinGecko(body.url)
+    .then(resultado => {
+      return resp.json({
+        ok: true,
+        data: resultado.data[symbol]
+      });
+
+    }).catch(error => {
+      return resp.status(400).json({
+        ok: false,
+        error,
+      });  
+    });
+});
+
 
 
 /** 
@@ -277,28 +329,6 @@ const getQueryCoinGecko = async(url) => {
   }
   return resp;
 }
-
-app.post("/api/commons/getCryptoCurrencyGecko", (req, resp) => {
-
-  let body = req.body;
-  let symbol = body.symbol;
-
-  getQueryCoinGecko(body.url)
-    .then(resultado => {
-
-      return resp.json({
-        ok: true,
-        data: resultado.data[symbol]
-      });
-
-    }).catch(error => {
-      return resp.status(400).json({
-        ok: false,
-        error,
-      });  
-    });
-});
-
 
 /**
  * Obtiene las criptomonedas de un usuario 
