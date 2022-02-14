@@ -16,7 +16,7 @@ process.env.CADUCIDAD_TOKEN = Math.floor(Date.now() / 1000) + 60 * 60;
 // =======================
 //  Seed
 // =======================
-process.env.SEED = process.env.SEED || "QUITO-PICHINCHA-TovaGateway ";
+process.env.SEED = process.env.SEED || "QUITO-PICHINCHA-UTOPIA ";
 
 
 // =======================

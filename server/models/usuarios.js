@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const uniqueValidator = require('mongoose-unique-validator');
+const CONST = require("../commons/constants");
 
 let Schema = mongoose.Schema;
 
@@ -46,7 +47,7 @@ let usuarioSchema = new Schema({
     }, 
     role:{
         type: String,
-        required: [true, 'required']
+        default: CONST.ROLE.USER
     }
 });
 

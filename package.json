@@ -1,7 +1,7 @@
 {
   "name": "api",
   "version": "1.0.0",
-  "description": "Gateway Tova",
+  "description": "Gateway Utopia",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -10,7 +10,7 @@
   "engines": {
     "node": "12.19.0"
   },
-  "author": "TovaExchange",
+  "author": "Utopia",
   "license": "ISC",
   "dependencies": {
     "axios": "^0.19.2",
