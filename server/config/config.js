@@ -22,7 +22,7 @@ process.env.SEED = process.env.SEED || "QUITO-PICHINCHA-UTOPIA ";
 // =======================
 //  Base de datos
 // =======================
-process.env.MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/gateway";
+process.env.MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/utopia";
 
 
 // =======================
