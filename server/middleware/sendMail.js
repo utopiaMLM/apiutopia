@@ -24,7 +24,7 @@ var transporter = nodemailer.createTransport({
 let sendEmail = (email,subjectTxt,contentHTML) => {
     transporter.sendMail(
       {
-        from: '"Admin TovaExchange" <admin@strongerdoge.com>',
+        from: '"Admin Utopia Pagos" <admin@strongerdoge.com>',
         to: email,
         subject : subjectTxt,
         html: contentHTML
@@ -55,7 +55,7 @@ let sendEmail = (email,subjectTxt,contentHTML) => {
 let sendEmailWithParams = (userDB,subjectTxt,contentHTML) => {
     transporter.sendMail(
       {
-        from: '"Admin TovaExchange" <admin@strongerdoge.com>',
+        from: '"Admin Utopia Pagos" <admin@strongerdoge.com>',
         to: userDB.email,
         subject : subjectTxt,
         html: contentHTML
