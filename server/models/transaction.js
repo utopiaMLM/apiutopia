@@ -39,6 +39,12 @@ let transactionSchema = new Schema({
     purchaseId: {
       type: String
     },
+    userId: {
+      type: Number
+    },
+    packageId: {
+      type: Number
+    },
     symbol: {
       type: String
     }, 
