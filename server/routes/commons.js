@@ -8,6 +8,7 @@ const Country = require("../models/country");
 const Blockchain = require("../models/blockchain");
 const BlockchainsUser = require("../models/blockchains_user");
 const CryptoCurrency = require("../models/cryptocurrency");
+const WalletUser = require("../models/wallet_user");
 const axios = require('axios');
 const fs = require('fs');
 const got = require('got');
@@ -19,6 +20,107 @@ const {
 } = require("../middleware/autenticacion");
 const app = express();
 app.use(cors());
+
+/**
+ * Obtiene todas las wallets del usuario
+ */
+app.post("/api/commons/getAllWalletsUser", [verificaToken], (req, resp) => {
+  let body = req.body;
+  const usuarioId = req.usuarioid;
+    
+  WalletUser.find({ user: usuarioId },"id walletblockchains")
+  .exec((err, walletsu) => {   
+    
+    if (err) {
+      return resp.status(400).json({
+        ok: false
+      });
+    }
+
+    if(walletsu && walletsu.length>0){
+      resp.json({
+        data: walletsu[0]
+      });
+    }else{
+      resp.json({
+        data: null
+      });
+    }
+  });
+
+});
+
+/**
+ * Guarda las wallets del usuario
+ */
+ app.post("/api/commons/saveWallets", [verificaToken], (req, resp) => {
+
+  let body = req.body;
+  const usuarioId = req.usuarioid;
+    
+  WalletUser.find({ user: usuarioId })
+  .exec((err, walletsu) => {   
+    
+    if (err) {
+      return resp.status(400).json({
+        ok: false
+      });
+    }
+
+
+    if(walletsu.length > 0) {
+      
+      const update = {walletblockchains: body.walletblockchains, creation_date: new Date()}
+
+      WalletUser.findOneAndUpdate(
+        { _id: walletsu[0]._id },update
+        ).exec((err, walletUdapte) => {
+          if (err) {
+            return resp.status(500).json({
+              ok: false,
+              err,
+            });
+          }
+          if (!walletUdapte) {
+            return resp.status(400).json({
+              ok: false,
+              err: {
+                err
+              },
+            });
+          }else{
+            resp.json({
+              ok: true,
+              saved: true,
+            });
+          }   
+        });  
+      }else if(walletsu.length == 0){
+
+            let walletUser = new WalletUser({ 
+              user: usuarioId,
+              walletblockchains: body.walletblockchains
+            });
+
+            walletUser.save((err, wallets) => {
+              if (err) {
+                return resp.status(400).json({
+                  ok: false,
+                  err,
+                });
+              }
+
+              if(wallets){
+                resp.json({
+                  ok: true,
+                  saved: true,
+                });
+              }
+            });
+      }        
+    });
+});
+
 
 /**
  * Obtiene el precio de utopia
@@ -355,7 +457,6 @@ app.post("/api/getCryptosByProfileById", (req, resp) => {
           },
         });
       }
-      console.log("blocks.blockchains ", blocks.blockchains);
 
       Blockchain.find(  { '_id': { $in: blocks.blockchains } }, "name symbol")
       .exec((err, blockchains) => {
