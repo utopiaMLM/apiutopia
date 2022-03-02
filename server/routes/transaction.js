@@ -5,6 +5,9 @@ const Wallets = require("../models/wallets");
 const CryptoCurrency = require("../models/cryptocurrency");
 const Blockchain = require("../models/blockchain");
 const Usuario = require("../models/usuarios");
+const TransactionError = require("../models/transactionError");
+
+const axios = require('axios');
 const {
   templateCreateTransaction,
   templateAnulateTransaction,
@@ -20,6 +23,49 @@ const {
 } = require("../middleware/autenticacion");
 const app = express();
 app.use(cors());
+
+
+
+const sendResponse = async(userId, packageId, transactionId) => {
+  //const resp = await axios.get(`http://localhost/office/login/payment?user_id=${userId}&package_id=${packageId}&transaction_id=${transactionId}`);
+  const resp = await axios.get(`http://localhost/office/login/payment?user_id=${userId}&package_id=${packageId}&transaction_id=${transactionId}`);
+
+  console.log("resp ", resp);
+
+  if (resp.length === 0) {
+      console.log(`No hay resultados para ${userId}, ${packageId}, ${transactionId}`);
+  }  
+}
+
+/** Pagos */
+app.get("/api/transaction/payment",  (req, resp) => {
+  
+  const query= req.query;
+
+  const user_id= query.user_id;
+  const transaction_id= query.transaction_id;
+  const new_package_id= query.new_package_id;
+
+  let transactionError = new TransactionError({
+    transaction: transaction_id,
+    user_id_utopia: user_id,
+    new_package_id: new_package_id
+  }); 
+
+  transactionError.save((err, result) => {
+    if (err) {
+
+      console.log(err)
+      resp.json({
+        ok: false
+      });
+    }
+    resp.json({
+      ok: true
+    });
+  }); 
+
+});
 
 /** Crea una transaccion del gateway de pago */
 app.post("/api/transaction/generateTransaction", (req, resp) => {  
@@ -518,7 +564,7 @@ let createObjectTransaction = (transaction,cryptocurrency,store) => {
 
 
 // Actualiza la transaccion a exitosa 
-let updateStatusSuccessfull = (transaction,LANG) => {  
+let updateStatusSuccessfull = async (transaction,LANG) => {  
   return new Promise((resolve, reject) => {
       
       const update = {status: CONST.STATUS.SUCESSFULL, processdate: new Date()}
@@ -541,6 +587,10 @@ let updateStatusSuccessfull = (transaction,LANG) => {
           datos= datos.replace('$wallet',tran.walletAddress);    
           emailModule.sendEmail(transaction.clientEmail, subject, datos);           
           resolve(tran);
+          
+          //Envia respuesta
+          sendResponse(tran.userId, tran.packageId);
+
       });
    }); 
  }
